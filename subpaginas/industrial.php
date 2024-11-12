@@ -1,3 +1,29 @@
+<?php
+// Incluir la conexión a la base de datos
+require_once '../config/database.php';
+
+// Obtener el término de búsqueda desde el formulario
+$search = $_GET['search'] ?? '';
+
+// Preparar la consulta SQL
+if ($search) {
+    // Si el campo de búsqueda tiene texto, usar la cláusula WHERE con LIKE
+    $sql = "SELECT * FROM artistas WHERE artista LIKE :search";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':search', '%' . $search . '%');
+} else {
+    // Si el campo de búsqueda está vacío, seleccionar todos los artistas
+    $sql = "SELECT * FROM artistas";
+    $stmt = $pdo->prepare($sql);
+}
+
+// Ejecutar la consulta
+$stmt->execute();
+
+// Obtener los resultados de la consulta
+$artistas_filtrados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,11 +37,11 @@
         <h1><a href="../index.html" style="color: white; text-decoration: none;">BAUHAUS</a></h1>
         <nav>
             <ul>
-                <li><a href="../secciones/arquitectura.html">Arquitectura</a></li>
-                <li><a href="../secciones/industrial.html">Industrial</a></li>
-                <li><a href="../secciones/mobiliario.html">Mobiliario</a></li>
-                <li><a href="../secciones/galeria.html">Galeria</a></li>
-                <li><a href="../secciones/inicio_de_sesión.php">Inicio de Sesión</a></li>
+                <li><a href="../subpaginas/arquitectura.html">Arquitectura</a></li>
+                <li><a href="../subpaginas/industrial.php">Industrial</a></li>
+                <li><a href="../subpaginas/mobiliario.html">Mobiliario</a></li>
+                <li><a href="../subpaginas/galeria.html">Galeria</a></li>
+                <li><a href="../subpaginas/inicio_de_sesión.php">Inicio de Sesión</a></li>
             </ul>
         </nav>
     </header>
@@ -33,32 +59,31 @@
             </div>
         </div>
         <section class="influencers">
-            <h2>Principales Influyentes</h2>            
             <!-- Buscador de artistas -->
             <form method="GET" action="">
                 <input type="text" name="search" placeholder="Buscar artista" />
                 <button type="submit">Buscar</button>
             </form>
-            <!--  -->
-            <div class="influencer-container">
-                <div class="influencer-card">
-                    <img src="../imagenes/influyentes breuer.jpg" alt="Marcel Breuer">
-                    <h3>Marcel Breuer</h3>
-                    <p>Pionero en el uso del acero tubular para muebles, como su famosa silla Wassily. Su enfoque combinaba funcionalidad con diseño minimalista, influenciando el diseño de productos industriales.</p>
+            <!--  == Influyentes ==-->
+            <section class="influencers">
+            <h2>Principales Influyentes</h2>
+                <div class="influencer-container">
+                    <?php if (empty($artistas_filtrados)): ?>
+                        <p>No se encontraron resultados para "<?php echo htmlspecialchars($search); ?>"</p>
+                    <?php else: ?>
+                        <?php foreach ($artistas_filtrados as $artista): ?>
+                            <div class="influencer-card">
+                                <img src="<?php echo $artista['imagen']; ?>" alt="<?php echo htmlspecialchars($artista['nombre']); ?>">
+                                <h3><?php echo htmlspecialchars($artista['artista']); ?></h3>
+                                <p><?php echo htmlspecialchars($artista['descripcion']); ?></p>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
-                <div class="influencer-card">
-                    <img src="../imagenes/influyentes wagenfeld.jpg" alt="Wilhelm Wagenfeld">
-                    <h3>Wilhelm Wagenfeld</h3>
-                    <p>Conocido por su icónica lámpara WG24, creó objetos cotidianos de diseño sencillo y práctico, utilizando materiales industriales y democratizando el buen diseño.</p>
-                </div>
-                <div class="influencer-card">
-                    <img src="../imagenes/influyentes moholy.jpg" alt="László Moholy-Nagy">
-                    <h3>László Moholy-Nagy</h3>
-                    <p>Innovador en la integración de nuevas tecnologías en el diseño, impulsó la experimentación con materiales como el metal y el vidrio, influenciando el enfoque funcional y estético del diseño de productos.</p>
-                </div>
-            </div>
-        </section>
-        <section class="influencers">
+            </section>
+
+        <!--  -->
+        <!-- <section class="influencers"> -->
         <h2>Productos</h2>
         <div class="influencer-container">
             <div class="influencer-card">
