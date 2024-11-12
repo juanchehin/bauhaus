@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <header>
-        <a href="../index.html">  <h1>BAUHAUS</h1> </a>
+        <a href="../index.html" style="text-decoration: none;">  <h1>BAUHAUS</h1> </a>
         <nav>
             <ul>
             <li><a href="arquitectura.html">Arquitectura</a></li>
